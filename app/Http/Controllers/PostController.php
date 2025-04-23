@@ -15,6 +15,20 @@ class PostController extends Controller
      *     path="/api/posts",
      *     summary="Get list of posts",
      *     tags={"Posts"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *      @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of posts",
@@ -27,16 +41,31 @@ class PostController extends Controller
      *                 @OA\Property(property="author_id", type="integer"),
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             ))
+     *             )),
+     *             @OA\Property(property="meta", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="last_page", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer")
+     *             )
      *         )
      *     )
      * )
      */
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $posts = Post::with('author')->get();
-        return response()->json(['data' => $posts]);
+        $perPage = $request->get('per_page', 10);
+        $posts = Post::with('author')->paginate($perPage);
+        return response()->json([
+            'data' => $posts->items(),
+            'meta' => [
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'per_page' => $posts->perPage(),
+                'total' => $posts->total(),
+            ]
+        ]);
     }
 
     /**
