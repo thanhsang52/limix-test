@@ -87,14 +87,14 @@ class UserController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
-            // Validate dữ liệu đầu vào
+            // Validate input data
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
             ]);
 
-            // Nếu lỗi validate, trả về lỗi 422
+            // If validate fail, response error code 422
             if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
@@ -107,7 +107,7 @@ class UserController extends Controller
             if(!empty($data['password']))
                 $data['password'] = bcrypt($data['password']);
 
-            // Lưu user
+            // Store user
             $user = User::create($data);
 
             return response()->json([
@@ -116,14 +116,14 @@ class UserController extends Controller
                 'data' => $user,
             ], 201);
         } catch (QueryException $e) {
-            // Lỗi SQL, ví dụ lỗi trùng email do race condition
+            // Error SQL, sample error duplicated email
             return response()->json([
                 'status' => 'error',
                 'message' => 'Database error.',
                 'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
-            // Lỗi không xác định
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'An unexpected error occurred.',
