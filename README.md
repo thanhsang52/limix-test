@@ -95,6 +95,10 @@ Make sure your Laravel app is running and CORS settings allow local browser acce
 
 ## 🔗 API Endpoints
 
+- `POST /api/login` – authenticate and receive a token.
+
+Include `Authorization: Bearer <token>` in headers for protected routes.
+
 ### Users
 - `GET /api/users` - Get All User
 - `POST /api/users` - Create New User
