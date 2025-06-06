@@ -167,7 +167,7 @@ class PostController extends Controller
             ], 422);
         }
 
-        $post->update($request->only(['title', 'content', 'author_id']));
+        $post->update($validator->validated());
         return response()->json(['message' => 'Post updated', 'data' => $post]);
     }
 
